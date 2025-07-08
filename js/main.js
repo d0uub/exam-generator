@@ -161,10 +161,6 @@ class ExamGeneratorApp {
             }
         });
 
-        document.getElementById('submitExamBtn')?.addEventListener('click', () => {
-            this.submitExam();
-        });
-
         // Delegated event listeners
         document.addEventListener('click', (e) => {
             // Find the closest exam action button (if any)
@@ -403,17 +399,8 @@ class ExamGeneratorApp {
                 if (takeExamContent) {
                     takeExamContent.innerHTML = this.examRenderer.renderExamResults(results, this.currentExam);
                     
-                    // Change submit button to "Close" after submission
-                    const submitButton = document.getElementById('submitExamBtn');
-                    if (submitButton) {
-                        submitButton.textContent = 'Close';
-                        submitButton.className = 'btn btn-primary';
-                        submitButton.removeEventListener('click', this.submitExam);
-                        submitButton.addEventListener('click', () => {
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('takeExamModal'));
-                            if (modal) modal.hide();
-                        });
-                    }
+                    // Let ExamRenderer handle button state change
+                    this.examRenderer.setSubmitButtonToClose();
                 }
             }
         } catch (error) {

@@ -124,15 +124,7 @@ class ExamRenderer {
         this.startTime = new Date();
         
         // Reset submit button to original state
-        const submitButton = document.getElementById('submitExamBtn');
-        if (submitButton) {
-            submitButton.textContent = 'Submit Exam';
-            submitButton.className = 'btn btn-success';
-            
-            // Remove any existing event listeners by cloning the button
-            const newSubmitButton = submitButton.cloneNode(true);
-            submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
-        }
+        this.resetSubmitButton();
         
         // Render interactive exam
         const examContent = this.renderInteractiveExam(exam);
@@ -218,11 +210,6 @@ class ExamRenderer {
                                             <iframe id="translateFrame" 
                                                     src="https://dict.cn/reading" 
                                                     style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 5px;">
-                                            </iframe>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                                             </iframe>
                                         </div>
                                     </div>
@@ -349,6 +336,9 @@ class ExamRenderer {
     startExam(exam, containerElement) {
         this.currentExam = exam;
         this.userAnswers = {};
+        
+        // Reset submit button to original state
+        this.resetSubmitButton();
         
         // Render the interactive exam
         const interactiveContent = this.renderInteractiveExam(exam);
@@ -501,6 +491,9 @@ class ExamRenderer {
             seconds: elapsedTime,
             formatted: this.formatTime(elapsedTime)
         };
+        
+        // Set submit button to close state
+        this.setSubmitButtonToClose();
         
         return results;
     }
@@ -992,6 +985,49 @@ class ExamRenderer {
      */
     cleanup() {
         // No event listeners to clean up since we use inline onclick handlers
+    }
+
+    /**
+     * Set submit button to "Close" state after exam submission
+     */
+    setSubmitButtonToClose() {
+        const submitButton = document.getElementById('submitExamBtn');
+        if (submitButton) {
+            submitButton.textContent = 'Close';
+            submitButton.className = 'btn btn-primary';
+            
+            // Remove any existing event listeners by cloning the button
+            const newSubmitButton = submitButton.cloneNode(true);
+            submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+            
+            // Add close modal event listener
+            newSubmitButton.addEventListener('click', () => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('takeExamModal'));
+                if (modal) modal.hide();
+            });
+        }
+    }
+
+    /**
+     * Reset submit button to initial "Submit Exam" state
+     */
+    resetSubmitButton() {
+        const submitButton = document.getElementById('submitExamBtn');
+        if (submitButton) {
+            submitButton.textContent = 'Submit Exam';
+            submitButton.className = 'btn btn-success';
+            
+            // Remove any existing event listeners by cloning the button
+            const newSubmitButton = submitButton.cloneNode(true);
+            submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+            
+            // Re-add the submit event listener
+            newSubmitButton.addEventListener('click', () => {
+                if (window.examApp) {
+                    window.examApp.submitExam();
+                }
+            });
+        }
     }
 }
 
