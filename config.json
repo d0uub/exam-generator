@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "Online Exam Generator",
+    "version": "1.0.0",
+    "description": "AI-powered exam generation with local storage"
+  },
+  "apis": {
+    "openrouter": {
+      "baseUrl": "https://openrouter.ai/api/v1/chat/completions",
+      "model": "moonshotai/kimi-dev-72b:free"
+    }
+  },
+  "examTypes": {
+    "fillInBlank": {
+      "name": "Fill in the Blank",
+      "description": "Questions with missing words to complete",
+      "supportsHints": true,
+      "supportsWordBank": true
+    },
+    "multipleChoice": {
+      "name": "Multiple Choice",
+      "description": "Questions with predefined answer options",
+      "minOptions": 2,
+      "maxOptions": 6,
+      "defaultOptions": 4
+    },
+    "trueFalse": {
+      "name": "True/False",
+      "description": "Binary choice questions"
+    },
+    "sentenceOrdering": {
+      "name": "Sentence Ordering",
+      "description": "Arrange sentences in correct order",
+      "dragAndDrop": true
+    },
+    "shortAnswer": {
+      "name": "Short Answer",
+      "description": "Brief keyword-based responses",
+      "keywordMatching": true
+    },
+    "longAnswer": {
+      "name": "Long Answer",
+      "description": "Detailed responses with AI comparison",
+      "requiresAI": true,
+      "minLength": 50
+    },
+    "readingComprehension": {
+      "name": "Reading Comprehension",
+      "description": "Passage-based questions with mixed types",
+      "includesPassage": true,
+      "mixedTypes": true
+    }
+  },
+  "scoring": {
+    "passingGrade": 70,
+    "partialCreditThreshold": 0.5,
+    "keywordMatchThreshold": 0.5,
+    "longAnswerMinLength": 50,
+    "longAnswerMediumLength": 150
+  },
+  "ui": {
+    "maxQuestionsPerSection": 20,
+    "defaultQuestionsPerSection": 5,
+    "autoSaveInterval": 30000,
+    "progressUpdateInterval": 1000
+  },
+  "subjects": [
+    "English",
+    "Mathematics",
+    "Science",
+    "History",
+    "Geography",
+    "Computer Science",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Literature",
+    "Foreign Language",
+    "Art",
+    "Music",
+    "Physical Education",
+    "Social Studies",
+    "Economics",
+    "Philosophy",
+    "Psychology",
+    "Other"
+  ],
+  "samplePrompts": {
+    "english": "Create an English exam focusing on grammar, vocabulary, and reading comprehension. Include questions about verb tenses, sentence structure, and passage analysis.",
+    "math": "Generate a mathematics assessment covering algebra, geometry, or arithmetic. Include word problems and step-by-step calculations.",
+    "science": "Create a science exam with questions about scientific concepts, experiments, and real-world applications.",
+    "history": "Generate a history assessment covering specific time periods, events, and historical figures with analysis questions.",
+    "general": "Create an exam with a mix of question types to assess understanding of the specified topic."
+  }
+}

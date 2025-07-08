@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Exam Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-graduation-cap"></i> Online Exam Generator
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <span id="tokenStatus" class="navbar-text me-3" style="display: none;">
+                        <small class="text-light"></small>
+                    </span>
+                    <button class="btn btn-outline-light" id="settingsBtn">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <!-- Settings Modal -->
+            <div class="modal fade" id="settingsModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">API Settings</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="openrouterToken" class="form-label">OpenRouter API Token</label>
+                                <input type="password" class="form-control" id="openrouterToken" placeholder="Enter your OpenRouter API token">
+                                <div class="form-text">Required for AI-generated exam content</div>
+                            </div>
+                            <div class="mb-3" id="modelSelectionContainer" style="display: none;">
+                                <label for="modelSelect" class="form-label">AI Model</label>
+                                <select class="form-select" id="modelSelect">
+                                    <option value="">Loading models...</option>
+                                </select>
+                                <div class="form-text">Select a free model for exam generation</div>
+                                <div id="modelLoadingSpinner" class="text-center mt-2" style="display: none;">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <small class="text-muted ms-2">Fetching available models...</small>
+                                </div>
+                            </div>
+                            <div id="configInfo">
+                                <!-- Configuration info will be displayed here -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveSettings">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-plus-circle"></i> Generate New Exam</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="examGeneratorForm">
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control" id="subject" placeholder="e.g., English, Math, Science" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Exam Sections</label>
+                                    <small class="text-muted d-block mb-2">Add sections with different question types and specific requirements</small>
+                                    
+                                    <div id="examSections" class="mb-3">
+                                        <!-- Dynamic sections will be added here -->
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="addSectionBtn">
+                                        <i class="fas fa-plus"></i> Add Section
+                                    </button>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-magic"></i> Generate Exam
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-list"></i> Exam Papers</h5>
+                            <div>
+                                <button class="btn btn-outline-success btn-sm me-2" id="importExamsBtn">
+                                    <i class="fas fa-upload"></i> Import
+                                </button>
+                                <button class="btn btn-outline-info btn-sm me-2" id="exportExamsBtn">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm" id="refreshExams">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="examsList">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                                    <p>No exams found. Generate your first exam to get started.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exam Preview Modal -->
+            <div class="modal fade" id="examPreviewModal" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Exam Preview</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="examPreviewContent">
+                            <!-- Exam content will be loaded here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="takeExamBtn">Take Exam</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Take Exam Modal -->
+            <div class="modal fade" id="takeExamModal" tabindex="-1">
+                <div class="modal-dialog" style="max-width: 90%; width: 90%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Take Exam</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="takeExamContent">
+                            <!-- Interactive exam will be loaded here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success" id="submitExamBtn">Submit Exam</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Exam Modal -->
+            <div class="modal fade" id="editExamModal" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Exam</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="editExamContent">
+                            <!-- Editable exam content will be loaded here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveExamChanges">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="mt-2">Processing...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Load utility modules first -->
+    <script src="js/utils/storage.js"></script>
+    <script src="js/ui/notifications.js"></script>
+    
+    <!-- Load configuration and API modules -->
+    <script src="js/config/config-manager.js"></script>
+    <script src="js/api/openrouter-api.js"></script>
+    
+    <!-- Load application modules -->
+    <script src="js/modules/exam-generator.js"></script>
+    <script src="js/modules/exam-manager.js"></script>
+    <script src="js/modules/exam-renderer.js"></script>
+    <script src="js/modules/settings-manager.js"></script>
+    <script src="js/modules/section-manager.js"></script>
+    
+    <!-- Load main application -->
+    <script src="js/main.js"></script>
+</body>
+</html>
