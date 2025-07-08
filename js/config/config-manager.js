@@ -29,7 +29,9 @@ class ConfigManager {
                 maxQuestionsPerSection: 20,
                 defaultQuestionsPerSection: 5,
                 autoSaveInterval: 30000,
-                progressUpdateInterval: 1000
+                progressUpdateInterval: 1000,
+                showPreviewButton: false,
+                showEditButton: false
             }
         };
     }

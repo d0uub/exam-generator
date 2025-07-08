@@ -91,7 +91,7 @@ class ExamGeneratorApp {
     initializeSubModules() {
         // Initialize feature modules with correct dependencies
         this.examGenerator = new window.ExamGenerator(this.storage, this.notifications, this.openRouterAPI);
-        this.examManager = new window.ExamManager(this.storage, this.notifications);
+        this.examManager = new window.ExamManager(this.storage, this.notifications, this.config);
         this.examRenderer = new window.ExamRenderer(this.notifications);
         this.settingsManager = new window.SettingsManager(this.storage, this.notifications, this.config, this.openRouterAPI);
         this.sectionManager = new window.SectionManager(this.notifications);
@@ -171,10 +171,14 @@ class ExamGeneratorApp {
                 
                 switch (action) {
                     case 'preview':
-                        this.previewExam(examId);
+                        if (this.examManager.shouldShowPreviewButton()) {
+                            this.previewExam(examId);
+                        }
                         break;
                     case 'edit':
-                        this.editExam(examId);
+                        if (this.examManager.shouldShowEditButton()) {
+                            this.editExam(examId);
+                        }
                         break;
                     case 'take':
                         this.takeExam(examId);

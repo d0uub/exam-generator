@@ -132,6 +132,28 @@ class StorageManager {
     }
 
     /**
+     * Save UI settings to preferences
+     * @param {Object} uiSettings - UI settings object
+     */
+    saveUISettings(uiSettings) {
+        const preferences = this.getPreferences();
+        preferences.uiSettings = uiSettings;
+        this.savePreferences(preferences);
+    }
+
+    /**
+     * Get UI settings from preferences
+     * @returns {Object} UI settings object
+     */
+    getUISettings() {
+        const preferences = this.getPreferences();
+        return preferences.uiSettings || {
+            showPreviewButton: true, // Default values
+            showEditButton: true
+        };
+    }
+
+    /**
      * Generic localStorage setter
      * @param {string} key - Storage key
      * @param {string} value - Value to store

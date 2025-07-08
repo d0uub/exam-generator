@@ -4,9 +4,10 @@
  */
 
 class ExamManager {
-    constructor(storage, notifications) {
+    constructor(storage, notifications, config) {
         this.storage = storage;
         this.notifications = notifications;
+        this.config = config;
         this.currentExam = null;
         
         // Listen for exam generation events
@@ -57,12 +58,16 @@ class ExamManager {
                             </small>
                         </div>
                         <div class="exam-actions">
-                            <button class="btn btn-outline-primary btn-sm me-1 exam-action-btn" data-action="preview" data-exam-id="${exam.id}">
-                                <i class="fas fa-eye"></i> Preview
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm me-1 exam-action-btn" data-action="edit" data-exam-id="${exam.id}">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
+                            ${this.shouldShowPreviewButton() ? `
+                                <button class="btn btn-outline-primary btn-sm me-1 exam-action-btn" data-action="preview" data-exam-id="${exam.id}">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>
+                            ` : ''}
+                            ${this.shouldShowEditButton() ? `
+                                <button class="btn btn-outline-secondary btn-sm me-1 exam-action-btn" data-action="edit" data-exam-id="${exam.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            ` : ''}
                             <button class="btn btn-outline-success btn-sm me-1 exam-action-btn" data-action="take" data-exam-id="${exam.id}">
                                 <i class="fas fa-play"></i> Take
                             </button>
@@ -323,6 +328,40 @@ class ExamManager {
             this.notifications.error('Failed to delete exam');
             return false;
         }
+    }
+
+    /**
+     * Check if Preview button should be shown based on configuration
+     * @returns {boolean} True if Preview button should be shown
+     */
+    shouldShowPreviewButton() {
+        // Check user settings in storage first, then fall back to config
+        const uiSettings = this.storage.getUISettings();
+        if (uiSettings.showPreviewButton !== undefined) {
+            return uiSettings.showPreviewButton;
+        }
+        
+        // Fallback to config
+        if (!this.config) return true; // Default to showing if no config
+        const config = this.config.getConfig();
+        return config?.ui?.showPreviewButton !== false; // Default to true if not explicitly set to false
+    }
+
+    /**
+     * Check if Edit button should be shown based on configuration
+     * @returns {boolean} True if Edit button should be shown
+     */
+    shouldShowEditButton() {
+        // Check user settings in storage first, then fall back to config
+        const uiSettings = this.storage.getUISettings();
+        if (uiSettings.showEditButton !== undefined) {
+            return uiSettings.showEditButton;
+        }
+        
+        // Fallback to config
+        if (!this.config) return true; // Default to showing if no config
+        const config = this.config.getConfig();
+        return config?.ui?.showEditButton !== false; // Default to true if not explicitly set to false
     }
 }
 

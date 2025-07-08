@@ -21,6 +21,8 @@ class SettingsManager {
         // Load current values
         const openrouterInput = document.getElementById('openrouterToken');
         const modelSelect = document.getElementById('modelSelect');
+        const showPreviewButton = document.getElementById('showPreviewButton');
+        const showEditButton = document.getElementById('showEditButton');
         
         if (openrouterInput) {
             const token = this.storage.getOpenRouterToken();
@@ -40,6 +42,21 @@ class SettingsManager {
             }
         }
 
+        // Load UI settings from storage (preferred) or config (fallback)
+        const uiSettings = this.storage.getUISettings();
+        const config = this.config.getConfig();
+        
+        if (showPreviewButton) {
+            showPreviewButton.checked = uiSettings.showPreviewButton !== undefined ? 
+                uiSettings.showPreviewButton : 
+                (config?.ui?.showPreviewButton !== false);
+        }
+        if (showEditButton) {
+            showEditButton.checked = uiSettings.showEditButton !== undefined ? 
+                uiSettings.showEditButton : 
+                (config?.ui?.showEditButton !== false);
+        }
+
         // Show current configuration
         this.displayConfigInfo();
 
@@ -54,14 +71,24 @@ class SettingsManager {
     saveSettings() {
         const openrouterToken = document.getElementById('openrouterToken')?.value.trim() || '';
         const selectedModel = document.getElementById('modelSelect')?.value || '';
+        const showPreviewButton = document.getElementById('showPreviewButton')?.checked !== false;
+        const showEditButton = document.getElementById('showEditButton')?.checked !== false;
 
-        // Save to storage
+        // Save API settings to storage
         this.storage.saveOpenRouterToken(openrouterToken);
         this.storage.saveSelectedModel(selectedModel);
         
+        // Save UI settings to storage
+        this.storage.saveUISettings({
+            showPreviewButton: showPreviewButton,
+            showEditButton: showEditButton
+        });
+        
         console.log('Saved settings:', { 
             hasToken: !!openrouterToken, 
-            selectedModel: selectedModel 
+            selectedModel: selectedModel,
+            showPreviewButton: showPreviewButton,
+            showEditButton: showEditButton
         });
         
         // Save selected model to configuration
@@ -74,6 +101,11 @@ class SettingsManager {
 
         // Update UI
         this.updateTokenStatus();
+        
+        // Refresh the exams list to show/hide buttons immediately
+        if (window.examApp && window.examApp.examManager) {
+            window.examApp.examManager.loadExamsFromStorage();
+        }
 
         // Close modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
